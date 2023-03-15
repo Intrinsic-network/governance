@@ -4,9 +4,9 @@ import { solidity, MockProvider, createFixtureLoader, deployContract } from 'eth
 
 import UniswapV2Factory from '@uniswap/v2-core/build/UniswapV2Factory.json'
 import UniswapV2Pair from '@uniswap/v2-core/build/UniswapV2Pair.json'
-import FeeToSetter from '../../build/FeeToSetter.json'
-import FeeTo from '../../build/FeeTo.json'
-import Int from '../../build/Int.json'
+import FeeToSetter from '../../artifacts/contracts/FeeToSetter.sol/FeeToSetter.json'
+import FeeTo from '../../artifacts/contracts/FeeTo.sol/FeeTo.json'
+import Int from '../../artifacts/contracts/Int.sol/Int.json'
 
 import { governanceFixture } from '../fixtures'
 import { mineBlock, expandTo18Decimals } from '../utils'

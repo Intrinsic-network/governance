@@ -2,7 +2,7 @@ import chai, { expect } from 'chai'
 import { Contract, BigNumber } from 'ethers'
 import { solidity, MockProvider, createFixtureLoader, deployContract } from 'ethereum-waffle'
 
-import TreasuryVester from '../../build/TreasuryVester.json'
+import TreasuryVester from '../../artifacts/contracts/TreasuryVester.sol/TreasuryVester.json'
 
 import { governanceFixture } from '../fixtures'
 import { mineBlock, expandTo18Decimals } from '../utils'

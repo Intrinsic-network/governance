@@ -6,7 +6,7 @@ import { ecsign } from 'ethereumjs-util'
 import { governanceFixture } from './fixtures'
 import { expandTo18Decimals, mineBlock } from './utils'
 
-import Int from '../build/Int.json'
+import Int from '../artifacts/contracts/Int.sol/Int.json'
 
 chai.use(solidity)
 
@@ -107,7 +107,9 @@ describe('Int', () => {
     await mineBlock(provider, timestamp.toString())
 
     await expect(int.connect(other1).mint(other1.address, 1)).to.be.revertedWith('Int::mint: only the minter can mint')
-    await expect(int.mint('0x0000000000000000000000000000000000000000', 1)).to.be.revertedWith('Int::mint: cannot transfer to the zero address')
+    await expect(int.mint('0x0000000000000000000000000000000000000000', 1)).to.be.revertedWith(
+      'Int::mint: cannot transfer to the zero address'
+    )
 
     // can mint up to 2%
     const mintCap = BigNumber.from(await int.mintCap())
@@ -118,6 +120,8 @@ describe('Int', () => {
     timestamp = await int.mintingAllowedAfter()
     await mineBlock(provider, timestamp.toString())
     // cannot mint 2.01%
-    await expect(int.mint(wallet.address, supply.mul(mintCap.add(1)))).to.be.revertedWith('Int::mint: exceeded mint cap')
+    await expect(int.mint(wallet.address, supply.mul(mintCap.add(1)))).to.be.revertedWith(
+      'Int::mint: exceeded mint cap'
+    )
   })
 })
