@@ -1,0 +1,10 @@
+{
+  "chainId": 31,
+  "deploymentDate": 1678957330209,
+  "addresses": {
+    "int": "0x1c29449652D0F63738c3Cd682A985E9b88F4966F",
+    "timelock": "0x3a3432449B4a3340B65C00578d8Ef31216539D79",
+    "governorAlpha": "0x25F5eaA36A6A851D62C08D5064c4ca2161Df8453",
+    "governorBravo": "0xD6A258B99709Efe1Db014b03700b48806913d7B0"
+  }
+}
