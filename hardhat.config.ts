@@ -5,6 +5,7 @@ import 'hardhat-typechain'
 
 import fs from 'fs'
 import path from 'path'
+import dotenv from 'dotenv'
 import { task, extendEnvironment } from 'hardhat/config'
 import { ContractFactory, Overrides, Signer, Wallet } from 'ethers'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
@@ -16,6 +17,8 @@ declare module 'hardhat/types/runtime' {
     deployGovernance: (deployer: Signer, overrides?: Overrides) => Promise<GovernanceDeploymentJSON>
   }
 }
+
+dotenv.config()
 
 const deployerAccount = process.env.DEPLOYER_PRIVATE_KEY || Wallet.createRandom().privateKey
 

@@ -3,3 +3,5 @@ build/
 artifacts/
 cache/
 typechain/
+.env
+yarn-error.log
