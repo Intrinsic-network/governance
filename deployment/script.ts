@@ -4,8 +4,8 @@ import { Signer, Wallet } from 'ethers'
 export interface GovernanceAddresses {
   int: string
   timelock: string
-  governorAlpha: string
-  governorBravo?: string
+  governorBravoDelegate: string
+  governorBravoDelegator: string
 }
 
 export interface GovernanceDeploymentJSON {
@@ -68,7 +68,7 @@ const deployContracts = async (
   const timelockDelay = 60 * 60 * 24 * 2
   log('Timelock delay:', timelockDelay)
 
-  const addresses = {
+  const addresses: Partial<GovernanceAddresses> = {
     int: await deployContract(
       deployer,
       getContractFactory,
@@ -81,20 +81,20 @@ const deployContracts = async (
     timelock: await deployContract(deployer, getContractFactory, 'Timelock', adminAccount, timelockDelay, {
       ...overrides,
     }),
+    governorBravoDelegate: await deployContract(deployer, getContractFactory, 'GovernorBravoDelegate', {
+      ...overrides,
+    }),
   }
 
   log()
-  const implementationAddress = process.env.GOV_BRAVO_IMPLEMENTATION_ADDRESS || Wallet.createRandom().privateKey
+  const implementationAddress =
+    process.env.GOV_BRAVO_IMPLEMENTATION_ADDRESS || addresses.governorBravoDelegate || Wallet.createRandom().privateKey
   log('GovernorBravo initial implementation address:', implementationAddress)
 
-  const votingPeriod = process.env.GOV_BRAVO_VOTING_PERIOD
-    ? parseInt(process.env.GOV_BRAVO_VOTING_PERIOD, 10)
-    : 40_320
+  const votingPeriod = process.env.GOV_BRAVO_VOTING_PERIOD ? parseInt(process.env.GOV_BRAVO_VOTING_PERIOD, 10) : 40_320
   log('GovernorBravo voting period:', votingPeriod)
 
-  const votingDelay = process.env.GOV_BRAVO_VOTING_DELAY
-    ? parseInt(process.env.GOV_BRAVO_VOTING_DELAY, 10)
-    : 1
+  const votingDelay = process.env.GOV_BRAVO_VOTING_DELAY ? parseInt(process.env.GOV_BRAVO_VOTING_DELAY, 10) : 1
   log('GovernorBravo voting delay:', votingDelay)
 
   const proposalThreshold = process.env.GOV_BRAVO_PROPOSAL_THRESHOLD
@@ -105,15 +105,7 @@ const deployContracts = async (
 
   return {
     ...addresses,
-    governorAlpha: await deployContract(
-      deployer,
-      getContractFactory,
-      'contracts/GovernorAlpha.sol:GovernorAlpha',
-      addresses.timelock,
-      addresses.int,
-      { ...overrides }
-    ),
-    governorBravo: await deployContract(
+    governorBravoDelegator: await deployContract(
       deployer,
       getContractFactory,
       'GovernorBravoDelegator',
@@ -126,7 +118,7 @@ const deployContracts = async (
       proposalThreshold,
       { ...overrides }
     ),
-  }
+  } as GovernanceAddresses
 }
 
 export const deployAndSetupContracts = async (

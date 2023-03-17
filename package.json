@@ -8,7 +8,7 @@
     "build"
   ],
   "scripts": {
-    "precompile": "rimraf ./build/",
+    "precompile": "rimraf ./artifacts/",
     "compile": "hardhat compile",
     "pretest": "yarn compile",
     "test": "hardhat test",
