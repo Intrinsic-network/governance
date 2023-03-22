@@ -1,5 +1,5 @@
 import { ContractFactory, Overrides } from '@ethersproject/contracts'
-import { Signer, Wallet } from 'ethers'
+import { ethers, Signer, Wallet } from 'ethers'
 
 export interface GovernanceAddresses {
   int: string
@@ -97,9 +97,9 @@ const deployContracts = async (
   const votingDelay = process.env.GOV_BRAVO_VOTING_DELAY ? parseInt(process.env.GOV_BRAVO_VOTING_DELAY, 10) : 1
   log('GovernorBravo voting delay:', votingDelay)
 
-  const proposalThreshold = process.env.GOV_BRAVO_PROPOSAL_THRESHOLD
-    ? parseInt(process.env.GOV_BRAVO_PROPOSAL_THRESHOLD, 10)
-    : 10_000
+  const proposalThreshold = ethers.BigNumber.from(process.env.GOV_BRAVO_PROPOSAL_THRESHOLD || '1000000').mul(
+    '1000000000000000000'
+  )
   log('GovernorBravo proposal threshold:', proposalThreshold)
   log()
 

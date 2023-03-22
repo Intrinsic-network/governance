@@ -39,11 +39,25 @@ const config = {
   solidity: {
     version: '0.5.16',
     settings: {
+      evmVersion: 'istanbul',
       optimizer: {
         enabled: true,
-        runs: 800,
+        runs: 999999,
       },
     },
+    outputSelection: {
+      '*': {
+        '*': [
+          'evm.bytecode.object',
+          'evm.deployedBytecode.object',
+          'abi',
+          'evm.bytecode.sourceMap',
+          'evm.deployedBytecode.sourceMap',
+          'metadata'
+        ],
+        '': ['ast']
+      }
+    }
   },
 }
 
