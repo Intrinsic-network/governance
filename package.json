@@ -1,11 +1,17 @@
 {
   "name": "@intrinsic-network/governance",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "🏛 Governance contracts for the Intrinsic protocol",
   "author": "Noah Zinsmeister",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Intrinsic-network/governance"
+  },
   "files": [
-    "build"
+    "contracts",
+    "artifacts/contracts/**/*.json",
+    "!artifacts/contracts/**/*.dbg.json"
   ],
   "scripts": {
     "precompile": "rimraf ./artifacts/",
@@ -13,7 +19,6 @@
     "pretest": "yarn compile",
     "test": "hardhat test",
     "lint": "prettier ./test/**/*.ts --check",
-    "prepublishOnly": "yarn test",
     "deploy": "npx hardhat deploy --network testnet"
   },
   "devDependencies": {

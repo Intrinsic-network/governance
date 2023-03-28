@@ -51,74 +51,91 @@ const deployContracts = async (
   getContractFactory: (name: string, signer: Signer) => Promise<ContractFactory>,
   overrides?: Overrides
 ): Promise<GovernanceAddresses> => {
-  const intInitialAccount = process.env.INT_INITIAL_ACCOUNT_ADDRESS || Wallet.createRandom().privateKey
-  log('INT initial account:', intInitialAccount)
-  const intMintingAccount = process.env.INT_MINTING_ACCOUNT_ADDRESS || Wallet.createRandom().privateKey
-  log('INT minting account:', intMintingAccount)
 
-  const intMintingDelay = process.env.INT_MINTING_DELAY_IN_DAYS
-    ? parseInt(process.env.INT_MINTING_DELAY_IN_DAYS, 10)
-    : 1
-  const mintingAllowedAfter = new Date()
-  mintingAllowedAfter.setDate(mintingAllowedAfter.getDate() + intMintingDelay)
-  log(`INT minting allowed: ${intMintingDelay} days from deployment`)
+  // ---- Deploy Int ---- //
 
-  const adminAccount = process.env.ADMIN_ADDRESS || Wallet.createRandom().privateKey
-  log('Admin account:', adminAccount)
+  // const intInitialAccount = process.env.INT_INITIAL_ACCOUNT_ADDRESS || Wallet.createRandom().privateKey
+  // log('INT initial account:', intInitialAccount)
+  // const intMintingAccount = process.env.INT_MINTING_ACCOUNT_ADDRESS || Wallet.createRandom().privateKey
+  // log('INT minting account:', intMintingAccount)
+
+  // const intMintingDelay = process.env.INT_MINTING_DELAY_IN_DAYS
+  //   ? parseInt(process.env.INT_MINTING_DELAY_IN_DAYS, 10)
+  //   : 1
+  // const mintingAllowedAfter = new Date()
+  // mintingAllowedAfter.setDate(mintingAllowedAfter.getDate() + intMintingDelay)
+  // log(`INT minting allowed: ${intMintingDelay} days from deployment`)
+
+  // const int = await deployContract(
+  //   deployer,
+  //   getContractFactory,
+  //   'Int',
+  //   intInitialAccount,
+  //   intMintingAccount,
+  //   mintingAllowedAfter.getTime(),
+  //   { ...overrides }
+  // )
+
+  const int = '0x167e06c5cadeca5193e70807704d55c14120155b'
+
+  // ---- Deploy GovernorBravoDelegate ---- //
+
+  const governorBravoDelegate = await deployContract(deployer, getContractFactory, 'GovernorBravoDelegate', {
+    ...overrides,
+  })
+
+  // ---- Deploy Timelock ---- //
+
+  const admin = process.env.ADMIN_ADDRESS
+  log('Timelock admin:', admin)
+
   const timelockDelay = 60 * 60 * 24 * 2
   log('Timelock delay:', timelockDelay)
+  
+  const timelock = await deployContract(deployer, getContractFactory, 'Timelock', admin, timelockDelay, {
+    ...overrides,
+  })
 
-  const addresses: Partial<GovernanceAddresses> = {
-    int: await deployContract(
-      deployer,
-      getContractFactory,
-      'Int',
-      intInitialAccount,
-      intMintingAccount,
-      mintingAllowedAfter.getTime(),
-      { ...overrides }
-    ),
-    timelock: await deployContract(deployer, getContractFactory, 'Timelock', adminAccount, timelockDelay, {
-      ...overrides,
-    }),
-    governorBravoDelegate: await deployContract(deployer, getContractFactory, 'GovernorBravoDelegate', {
-      ...overrides,
-    }),
-  }
+  // ---- Deploy GovernorBravoDelegator ---- //
 
   log()
-  const implementationAddress =
-    process.env.GOV_BRAVO_IMPLEMENTATION_ADDRESS || addresses.governorBravoDelegate || Wallet.createRandom().privateKey
-  log('GovernorBravo initial implementation address:', implementationAddress)
+  const implementation = governorBravoDelegate
+  log('GovernorBravoDelegator initial implementation address:', implementation)
+
+  log('GovernorBravoDelegator admin:', admin)
 
   const votingPeriod = process.env.GOV_BRAVO_VOTING_PERIOD ? parseInt(process.env.GOV_BRAVO_VOTING_PERIOD, 10) : 40_320
-  log('GovernorBravo voting period:', votingPeriod)
+  log('GovernorBravoDelegator voting period:', votingPeriod)
 
   const votingDelay = process.env.GOV_BRAVO_VOTING_DELAY ? parseInt(process.env.GOV_BRAVO_VOTING_DELAY, 10) : 1
-  log('GovernorBravo voting delay:', votingDelay)
+  log('GovernorBravoDelegator voting delay:', votingDelay)
 
   const proposalThreshold = ethers.BigNumber.from(process.env.GOV_BRAVO_PROPOSAL_THRESHOLD || '1000000').mul(
     '1000000000000000000'
   )
-  log('GovernorBravo proposal threshold:', proposalThreshold)
+  log('GovernorBravoDelegator proposal threshold:', proposalThreshold)
   log()
 
+  const governorBravoDelegator = await deployContract(
+    deployer,
+    getContractFactory,
+    'GovernorBravoDelegator',
+    timelock,
+    int,
+    admin,
+    implementation,
+    votingPeriod,
+    votingDelay,
+    proposalThreshold,
+    { ...overrides }
+  )
+
   return {
-    ...addresses,
-    governorBravoDelegator: await deployContract(
-      deployer,
-      getContractFactory,
-      'GovernorBravoDelegator',
-      addresses.timelock,
-      addresses.int,
-      adminAccount,
-      implementationAddress,
-      votingPeriod,
-      votingDelay,
-      proposalThreshold,
-      { ...overrides }
-    ),
-  } as GovernanceAddresses
+    int,
+    governorBravoDelegate,
+    timelock,
+    governorBravoDelegator,
+  }
 }
 
 export const deployAndSetupContracts = async (
