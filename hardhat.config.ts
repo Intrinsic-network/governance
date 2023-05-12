@@ -20,7 +20,10 @@ declare module 'hardhat/types/runtime' {
 
 dotenv.config()
 
-const deployerAccount = process.env.DEPLOYER_PRIVATE_KEY || Wallet.createRandom().privateKey
+const deployer = process.env.DEPLOYER_PRIVATE_KEY
+if (!deployer) {
+  throw 'Deployer is required'
+}
 
 const config = {
   networks: {
@@ -33,7 +36,7 @@ const config = {
     testnet: {
       chainId: 31,
       url: 'https://public-node.testnet.rsk.co/',
-      accounts: [deployerAccount],
+      accounts: [deployer],
     },
   },
   solidity: {
@@ -53,11 +56,11 @@ const config = {
           'abi',
           'evm.bytecode.sourceMap',
           'evm.deployedBytecode.sourceMap',
-          'metadata'
+          'metadata',
         ],
-        '': ['ast']
-      }
-    }
+        '': ['ast'],
+      },
+    },
   },
 }
 

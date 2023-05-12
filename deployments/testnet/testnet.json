@@ -1,10 +1,10 @@
 {
   "chainId": 31,
-  "deploymentDate": 1679990931185,
+  "deploymentDate": 1683868655098,
   "addresses": {
-    "int": "0x167e06c5cadeca5193e70807704d55c14120155b",
-    "governorBravoDelegate": "0x0239852027d8AA7c44B0615330865798Fcb83Ce2",
-    "timelock": "0x17F7251Ff7E5DFA996C77550911bA4C5527F3580",
-    "governorBravoDelegator": "0xBAaFFD2886aebdDC052608bd18D15dd9D50182dA"
+    "int": "0x53376356b542B8764c64411511b74dA9B9381E87",
+    "governorBravoDelegate": "0x1967385FE012A6CBCddB850Aa2019C914fe97fcA",
+    "timelock": "0x9fe2798055324d438bC0725AB3F1c8709566Ea2d",
+    "governorBravoDelegator": "0x5eb07844515F4040784d66F2422FBA6EDa80D8Cb"
   }
 }

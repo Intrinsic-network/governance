@@ -1,5 +1,6 @@
 import { ContractFactory, Overrides } from '@ethersproject/contracts'
 import { ethers, Signer, Wallet } from 'ethers'
+import { getAddress } from 'ethers/lib/utils'
 
 export interface GovernanceAddresses {
   int: string
@@ -16,6 +17,17 @@ export interface GovernanceDeploymentJSON {
 
 export const log = (...args: unknown[]): void => {
   console.log(...args)
+}
+
+const validateAddress = (address: string | undefined, requiredMessage: string): string => {
+  if (!address) {
+    throw requiredMessage
+  }
+  try {
+    return getAddress(address)
+  } catch (err) {
+    throw err
+  }
 }
 
 const deployContract = async (
@@ -37,6 +49,7 @@ const deployContract = async (
 
   log({
     contractAddress: contract.address,
+    transactionHash: receipt.transactionHash,
     blockNumber: receipt.blockNumber,
     gasUsed: receipt.gasUsed.toNumber(),
   })
@@ -51,32 +64,34 @@ const deployContracts = async (
   getContractFactory: (name: string, signer: Signer) => Promise<ContractFactory>,
   overrides?: Overrides
 ): Promise<GovernanceAddresses> => {
-
   // ---- Deploy Int ---- //
 
-  // const intInitialAccount = process.env.INT_INITIAL_ACCOUNT_ADDRESS || Wallet.createRandom().privateKey
-  // log('INT initial account:', intInitialAccount)
-  // const intMintingAccount = process.env.INT_MINTING_ACCOUNT_ADDRESS || Wallet.createRandom().privateKey
-  // log('INT minting account:', intMintingAccount)
+  const intInitialAccount = validateAddress(
+    process.env.INT_INITIAL_ACCOUNT_ADDRESS,
+    'INT initial account address is required'
+  )
+  log('INT initial account address:', intInitialAccount)
 
-  // const intMintingDelay = process.env.INT_MINTING_DELAY_IN_DAYS
-  //   ? parseInt(process.env.INT_MINTING_DELAY_IN_DAYS, 10)
-  //   : 1
-  // const mintingAllowedAfter = new Date()
-  // mintingAllowedAfter.setDate(mintingAllowedAfter.getDate() + intMintingDelay)
-  // log(`INT minting allowed: ${intMintingDelay} days from deployment`)
+  const intMinter = validateAddress(process.env.INT_MINTER_ADDRESS, 'INT minter address is required')
+  log('INT minter address:', intMinter)
 
-  // const int = await deployContract(
-  //   deployer,
-  //   getContractFactory,
-  //   'Int',
-  //   intInitialAccount,
-  //   intMintingAccount,
-  //   mintingAllowedAfter.getTime(),
-  //   { ...overrides }
-  // )
+  const intMintingDelay = process.env.INT_MINTING_DELAY_IN_DAYS
+    ? parseInt(process.env.INT_MINTING_DELAY_IN_DAYS, 10)
+    : 3
 
-  const int = '0x167e06c5cadeca5193e70807704d55c14120155b'
+  const mintingAllowedAfter = new Date()
+  mintingAllowedAfter.setDate(mintingAllowedAfter.getDate() + intMintingDelay)
+  log(`INT minting allowed after: ${intMintingDelay} days from deployment`)
+
+  const int = await deployContract(
+    deployer,
+    getContractFactory,
+    'Int',
+    intInitialAccount,
+    intMinter,
+    mintingAllowedAfter.getTime(),
+    { ...overrides }
+  )
 
   // ---- Deploy GovernorBravoDelegate ---- //
 
@@ -91,7 +106,7 @@ const deployContracts = async (
 
   const timelockDelay = 60 * 60 * 24 * 2
   log('Timelock delay:', timelockDelay)
-  
+
   const timelock = await deployContract(deployer, getContractFactory, 'Timelock', admin, timelockDelay, {
     ...overrides,
   })
@@ -100,7 +115,7 @@ const deployContracts = async (
 
   log()
   const implementation = governorBravoDelegate
-  log('GovernorBravoDelegator initial implementation address:', implementation)
+  log('GovernorBravoDelegator implementation address:', implementation)
 
   log('GovernorBravoDelegator admin:', admin)
 
