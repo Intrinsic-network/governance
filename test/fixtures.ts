@@ -4,7 +4,6 @@ import { solidity, deployContract } from 'ethereum-waffle'
 
 import Int from '../artifacts/contracts/Int.sol/Int.json'
 import Timelock from '../artifacts/contracts/Timelock.sol/Timelock.json'
-import GovernorAlpha from '../artifacts/contracts/GovernorAlpha.sol/GovernorAlpha.json'
 
 import { DELAY } from './utils'
 
@@ -13,7 +12,6 @@ chai.use(solidity)
 interface GovernanceFixture {
   int: Contract
   timelock: Contract
-  governorAlpha: Contract
 }
 
 export async function governanceFixture(
@@ -30,9 +28,5 @@ export async function governanceFixture(
   const timelock = await deployContract(wallet, Timelock, [governorAlphaAddress, DELAY])
   expect(timelock.address).to.be.eq(timelockAddress)
 
-  // deploy governorAlpha
-  const governorAlpha = await deployContract(wallet, GovernorAlpha, [timelock.address, int.address])
-  expect(governorAlpha.address).to.be.eq(governorAlphaAddress)
-
-  return { int, timelock, governorAlpha }
+  return { int, timelock }
 }
