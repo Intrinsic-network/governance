@@ -1,7 +1,5 @@
-import 'hardhat-typechain'
 import '@nomiclabs/hardhat-ethers'
 import '@nomiclabs/hardhat-waffle'
-import 'hardhat-typechain'
 
 import fs from 'fs'
 import path from 'path'
