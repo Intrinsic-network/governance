@@ -44,5 +44,8 @@
   "dependencies": {
     "@typechain/ethers-v5": "^11.1.2",
     "@typechain/hardhat": "^9.1.0"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
