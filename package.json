@@ -1,6 +1,6 @@
 {
-  "name": "@intrinsic-network/governance",
-  "version": "1.0.2",
+  "name": "@intrinsic-finance/governance",
+  "version": "1.0.0",
   "description": "🏛 Governance contracts for the Intrinsic protocol",
   "author": "Noah Zinsmeister",
   "license": "MIT",
